@@ -50,25 +50,9 @@ class QuerySearchBoth(graphene.Union):
         types = (Student, StudentMetaData)
 
 class Query(graphene.ObjectType):
-    node = relay.Node.Field()
-    search = graphene.List(QuerySearchBoth, q=graphene.String())  # List field for search results
-
-    # Normal Fields
     all_student = SQLAlchemyConnectionField(Student.connection)
     all_student_meta = SQLAlchemyConnectionField(StudentMetaData.connection)
+    student = relay.Node.Field(Student)
 
-
-    def resolve_search(self, info, **args):
-        q = args.get("q")
-
-        student_query = Student.get_query(info)
-        student_meta_query = StudentMetaData.get_query(info)
-
-        students = student_meta_query.filter((StudentMetaData.id.contains(q)) |
-                                        (StudentMetaData.student_id.any(StudentModel.id.contains(q)))).all()
-
-        students_meta = student_meta_query.filter(StudentMetaDataModel.id.contains(q)).all()
-
-        return students + students_meta
 
 schema = graphene.Schema(query=Query,types=[Student, StudentMetaData, QuerySearchBoth],  mutation=Mutation)
