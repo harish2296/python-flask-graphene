@@ -6,7 +6,7 @@ Python flask grahene example
 # Run
   -Run App.Py
   -Visit localhost port 5000 endpoint /graphql 
-# Sample Input
+# Sample Input Query
 {
   allStudent {
     edges {
@@ -24,5 +24,15 @@ Python flask grahene example
     }
   }
 }
+
+# Sample Input Mutation
+mutation {
+  createStudent(id: 3, name: "Rohit Sharma", email: "vijiharishv199622@gmail.com") {
+    id
+    name
+    email
+  }
+}
+
 
 
