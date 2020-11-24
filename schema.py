@@ -50,5 +50,12 @@ class Query(graphene.ObjectType):
     all_student_meta = SQLAlchemyConnectionField(StudentMetaData.connection)
     student = relay.Node.Field(Student)
 
+    find_student = graphene.Field(lambda: Student, id=graphene.Int())
+    def resolve_find_student(self, info, **kwargs):
+        query = Student.get_query(info)
+        id = kwargs.get("id")
+        return query.filter(StudentModel.id == id).first()
+
+
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
