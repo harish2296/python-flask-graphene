@@ -35,10 +35,11 @@ mutation {
 }
 
 # Sample Input Find by ID
-query {
-  student(id: 3) {
-    name
-  }
+query FindById($id: Int= 1) {
+    findStudent(id: $id) {
+        email
+        name
+    }
 }
 
 
