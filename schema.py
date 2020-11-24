@@ -3,6 +3,7 @@ from models import StudentMetaDataModel
 import graphene
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyConnectionField, SQLAlchemyObjectType
+from db_config import db_session
 
 
 class Student(SQLAlchemyObjectType):
@@ -16,25 +17,33 @@ class StudentMetaData(SQLAlchemyObjectType):
         model = StudentMetaDataModel
         interfaces = (relay.Node, )
 
-class StudentData(graphene.InputObjectType):
+class CreateStudent(graphene.Mutation):
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
     email = graphene.String(required=True)
-
-class CreateStudent(graphene.Mutation):
     class Arguments:
-        student_data = StudentData(required=True)
+        id = graphene.Int(required=True)
+        name = graphene.String(required=True)
+        email = graphene.String(required=True)
 
     student = graphene.Field(Student)
 
-    def mutate(root, info, student_data=None):
+    def mutate(root, info, id, name, email):
         student = Student(
-            id=student_data.id,
-            name=student_data.name,
-            email=student_data.email
+            id=id,
+            name=name,
+            email=email
         )
-        return CreateStudent(student=student)
+        model = StudentModel(id=id,name=name,email=email)
+        db_session.add(model)
+        db_session.commit()
+        return CreateStudent(
+            id=student.id,
+            name=student.name,
+            email=student.email)
 
+class Mutation(graphene.ObjectType):
+    create_student = CreateStudent.Field()
 
 class QuerySearchBoth(graphene.Union):
     class Meta:
@@ -62,4 +71,4 @@ class Query(graphene.ObjectType):
 
         return students + students_meta
 
-schema = graphene.Schema(query=Query,types=[Student, StudentMetaData, QuerySearchBoth],  mutation=CreateStudent)
+schema = graphene.Schema(query=Query,types=[Student, StudentMetaData, QuerySearchBoth],  mutation=Mutation)
