@@ -34,5 +34,12 @@ mutation {
   }
 }
 
+# Sample Input Find by ID
+query {
+  student(id: 3) {
+    name
+  }
+}
+
 
 
