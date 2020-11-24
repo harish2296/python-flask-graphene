@@ -45,14 +45,10 @@ class CreateStudent(graphene.Mutation):
 class Mutation(graphene.ObjectType):
     create_student = CreateStudent.Field()
 
-class QuerySearchBoth(graphene.Union):
-    class Meta:
-        types = (Student, StudentMetaData)
-
 class Query(graphene.ObjectType):
     all_student = SQLAlchemyConnectionField(Student.connection)
     all_student_meta = SQLAlchemyConnectionField(StudentMetaData.connection)
     student = relay.Node.Field(Student)
 
 
-schema = graphene.Schema(query=Query,types=[Student, StudentMetaData, QuerySearchBoth],  mutation=Mutation)
+schema = graphene.Schema(query=Query, mutation=Mutation)
